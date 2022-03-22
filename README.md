@@ -1,10 +1,11 @@
 # Mental Diary API
-A simple CRUD API for my Mental Diary project
+A simple CRUD RESTful API for my Mental Diary project
 
 ## Using:
 - Node JS
 - Express JS
-- Sequelize (as my ORM)
+- TypeScript
+- Sequelize (as my ORM) (I didn't know about Prisma, might change to that at some point)
 - PostgreSQL (as my database)
 
 ## P.S: 
