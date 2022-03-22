@@ -1,6 +1,6 @@
 import express, { ErrorRequestHandler } from "express";
-import { NotFoundError } from "./src/errors";
-import { DiaryItemRepository } from "./src/repositories";
+import { NotFoundError } from "./errors";
+import { DiaryItemRepository } from "./repositories";
 const app = express();
 const PORT = 3001;
 
@@ -77,5 +77,5 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`Example app listening on http://localhost:${PORT}`);
 });

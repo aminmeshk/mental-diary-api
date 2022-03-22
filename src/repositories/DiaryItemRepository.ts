@@ -14,8 +14,7 @@ class DiaryItemRepository {
     if (dbItem === null) {
       throw new NotFoundError(`DiaryItem with id ${id} was not found`);
     }
-    const { id: pulledId, ...otherProps } = diaryItem;
-    return await dbItem.update(otherProps);
+    return await dbItem.update(diaryItem);
   };
 
   delete = async (id: number) => {
