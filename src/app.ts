@@ -1,6 +1,6 @@
-import express from "express";
-import { NotFoundError } from "./src/errors/index.js";
-import { DiaryItemRepository } from "./src/repositories/index.js";
+import express, { ErrorRequestHandler } from "express";
+import { NotFoundError } from "./errors";
+import { DiaryItemRepository } from "./repositories";
 const app = express();
 const PORT = 3001;
 
@@ -14,7 +14,7 @@ app.get("/diary-item", (req, res, next) => {
     .catch(next);
 });
 
-app.get("/diary-item/:id", (req, res) => {
+app.get("/diary-item/:id", (req, res, next) => {
   if (!req.params.id) {
     res.status(400).json({ error: `id parameter cannot be null` });
     return;
@@ -47,7 +47,7 @@ app.post("/diary-item", (req, res, next) => {
 });
 
 app.put("/diary-item/:id", (req, res, next) => {
-  DiaryItemRepository.update(req.params.id, req.body)
+  DiaryItemRepository.update(parseInt(req.params.id), req.body)
     .then((result) => {
       res.status(200).json(result);
     })
@@ -55,22 +55,14 @@ app.put("/diary-item/:id", (req, res, next) => {
 });
 
 app.delete("/diary-item/:id", (req, res, next) => {
-  DiaryItemRepository.delete(req.params.id)
+  DiaryItemRepository.delete(parseInt(req.params.id))
     .then(() => {
       res.status(200).json();
     })
     .catch(next);
 });
 
-app.post("/diary-item/sync", (req, res, next) => {
-  DiaryItemRepository.sync()
-    .then(() => {
-      res.status(200).json();
-    })
-    .catch(next);
-});
-
-const errorHandler = (err, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }
@@ -85,5 +77,5 @@ const errorHandler = (err, req, res, next) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`Example app listening on http://localhost:${PORT}`);
 });
