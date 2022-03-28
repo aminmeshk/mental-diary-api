@@ -1,9 +1,9 @@
 import { DiaryItem } from "../models";
 import { DiaryItemDto } from "../models/Dtos";
 import { NotFoundError } from "../errors";
+import { SyncOptions } from "sequelize/types";
 
 class DiaryItemRepository {
-
   add = async (diaryItem: DiaryItemDto) => {
     const item = DiaryItem.build(diaryItem);
     return await item.save();
@@ -36,6 +36,10 @@ class DiaryItemRepository {
     return await DiaryItem.findAll({
       order: [["timestamp", "ASC"]],
     });
+  };
+
+  sync = async (options?: SyncOptions) => {
+    return await DiaryItem.sync(options);
   };
 }
 

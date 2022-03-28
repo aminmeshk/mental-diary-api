@@ -1,16 +1,18 @@
-import { Model, DataTypes, Sequelize } from "sequelize";
-import { DatabaseService } from "../services";
+import { DataTypes, Model, Sequelize } from "sequelize";
+import { User } from "./User";
 
-class DiaryItem extends Model {
+export class DiaryItem extends Model {
   declare id: number;
   declare timestamp: Date;
   declare description?: string;
   declare pleasure?: number;
   declare skill?: number;
   declare avoiding?: boolean;
+  declare userId: number;
+  declare User?: User;
 }
 
-const initDiaryItem = async (sequelize: Sequelize) =>
+export const initDiaryItem = (sequelize: Sequelize) =>
   DiaryItem.init(
     {
       id: {
@@ -41,12 +43,3 @@ const initDiaryItem = async (sequelize: Sequelize) =>
       modelName: "DiaryItem",
     }
   );
-
-DatabaseService.getInstance().then((dbService) => {
-  if (!dbService.sequelize) {
-    throw new Error('Sequelize failed to connect');
-  }
-  initDiaryItem(dbService.sequelize);
-});
-
-export default DiaryItem;

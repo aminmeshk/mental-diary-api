@@ -1,12 +1,58 @@
-import express, { ErrorRequestHandler } from "express";
+import express, { ErrorRequestHandler, RequestHandler } from "express";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 import { NotFoundError } from "./errors";
-import { DiaryItemRepository } from "./repositories";
+import { DiaryItemRepository, UserRepository } from "./repositories";
+import { setupModels } from "./models";
+import { DatabaseService } from "./services";
+
+dotenv.config();
+setupModels();
+
 const app = express();
 const PORT = 3001;
 
 app.use(express.json());
 
-app.get("/diary-item", (req, res, next) => {
+const verifyToken: RequestHandler = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token =
+    authHeader &&
+    authHeader.split(" ") &&
+    authHeader.split(" ").length == 2 &&
+    authHeader.split(" ")[1];
+  if (!token || token.length === 0) {
+    res.status(401).json({ error: "Invalid authorization token" });
+    return;
+  }
+  jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN_SECRET as string,
+    (err, decoded) => {
+      if (err) {
+        res.status(401).json({ error: err.message });
+        return;
+      }
+      (req as any).user = (decoded as any).user;
+      next();
+    }
+  );
+};
+
+app.post("/login", (req, res) => {
+  const username = req.body.username as string;
+  const user = { username: username };
+  const payload = { user: user };
+
+  jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET as string, (err, token) => {
+    if (err) {
+      throw err;
+    }
+    res.json({ access_token: token });
+  });
+});
+
+app.get("/diary-item", verifyToken, (req, res, next) => {
   DiaryItemRepository.getAll()
     .then((result) => {
       res.send(result);
@@ -14,7 +60,7 @@ app.get("/diary-item", (req, res, next) => {
     .catch(next);
 });
 
-app.get("/diary-item/:id", (req, res, next) => {
+app.get("/diary-item/:id", verifyToken, (req, res, next) => {
   if (!req.params.id) {
     res.status(400).json({ error: `id parameter cannot be null` });
     return;
@@ -38,7 +84,7 @@ app.get("/diary-item/:id", (req, res, next) => {
     .catch(next);
 });
 
-app.post("/diary-item", (req, res, next) => {
+app.post("/diary-item", verifyToken, (req, res, next) => {
   DiaryItemRepository.add(req.body)
     .then((result) => {
       res.status(200).json(result);
@@ -46,7 +92,18 @@ app.post("/diary-item", (req, res, next) => {
     .catch(next);
 });
 
-app.put("/diary-item/:id", (req, res, next) => {
+app.post("/sync", verifyToken, (req, res, next) => {
+  DatabaseService.getInstance().then((db) =>
+    db.sequelize
+      ?.sync({ alter: true })
+      .then((result) => {
+        res.status(200).json();
+      })
+      .catch(next)
+  );
+});
+
+app.put("/diary-item/:id", verifyToken, (req, res, next) => {
   DiaryItemRepository.update(parseInt(req.params.id), req.body)
     .then((result) => {
       res.status(200).json(result);
@@ -54,10 +111,18 @@ app.put("/diary-item/:id", (req, res, next) => {
     .catch(next);
 });
 
-app.delete("/diary-item/:id", (req, res, next) => {
+app.delete("/diary-item/:id", verifyToken, (req, res, next) => {
   DiaryItemRepository.delete(parseInt(req.params.id))
     .then(() => {
       res.status(200).json();
+    })
+    .catch(next);
+});
+
+app.get("/users", verifyToken, (req, res, next) => {
+  UserRepository.getAll()
+    .then((result) => {
+      res.status(200).json(result);
     })
     .catch(next);
 });
