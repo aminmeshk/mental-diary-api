@@ -5,9 +5,17 @@ import { SyncOptions } from "sequelize/types";
 import { DatabaseService } from "../services";
 
 class UserRepository {
-  add = async (user: UserDto) => {
+  toDto = (dbUser: User): Omit<UserDto, "hashed_password"> => ({
+    id: dbUser.id,
+    email: dbUser.email,
+    username: dbUser.username,
+    diaryItems: dbUser.diaryItems,
+  });
+
+  add = async (user: Omit<UserDto, "id">) => {
     const item = User.build(user);
-    return await item.save();
+    const dbUser = await item.save();
+    return this.toDto(dbUser);
   };
 
   update = async (id: number, user: UserDto) => {
@@ -32,13 +40,19 @@ class UserRepository {
   get = async (id: number) => {
     return await User.findByPk(id);
   };
+  
+  findByUsername = async (username: string) => {
+    return await User.findOne({where: {
+      username: username
+    }});
+  };
 
   getAll = async () => {
     return await User.findAll();
   };
 
   sync = async (options?: SyncOptions) => {
-    const db = await DatabaseService.getInstance()
+    const db = await DatabaseService.getInstance();
     return await db.sequelize?.sync(options);
   };
 }

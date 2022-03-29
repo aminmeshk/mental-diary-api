@@ -38,6 +38,15 @@ class DiaryItemRepository {
     });
   };
 
+  getAllByUserId = async (userId: number) => {
+    return await DiaryItem.findAll({
+      where: {
+        UserId: userId,
+      },
+      order: [["timestamp", "ASC"]],
+    });
+  };
+
   sync = async (options?: SyncOptions) => {
     return await DiaryItem.sync(options);
   };
