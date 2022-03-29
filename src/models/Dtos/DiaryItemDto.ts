@@ -5,4 +5,5 @@ export type DiaryItemDto = {
   pleasure?: number;
   skill?: number;
   avoiding?: boolean;
+  UserId?: number;
 };
