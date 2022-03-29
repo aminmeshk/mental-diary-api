@@ -1,5 +1,6 @@
 import { ErrorRequestHandler } from "express";
 import { NotFoundError } from "../errors";
+import { isProduction } from "../utils";
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (res.headersSent) {
@@ -9,6 +10,10 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof NotFoundError) {
     res.status(404).json({ error: err.message });
   } else {
-    res.status(500).json({ error: err.message });
+    if (isProduction()) {
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
   }
 };

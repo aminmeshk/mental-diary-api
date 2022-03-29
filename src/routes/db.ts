@@ -10,7 +10,7 @@ router.post("/sync", tokenHandler, (req, res, next) => {
     DatabaseService.getInstance().then((db) =>
       db.sequelize
         ?.sync({ alter: true })
-        .then((result) => {
+        .then(() => {
           res.status(200).json();
         })
         .catch(next)
