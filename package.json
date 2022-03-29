@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon",
-    "build": "tsc"
+    "build": "tsc",
+    "docker-build": "docker build . -t mental-diary-api"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.0",
