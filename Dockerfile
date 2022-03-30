@@ -7,7 +7,8 @@ COPY yarn.lock .
 RUN yarn install
 COPY . .
 COPY .env.docker .env
+COPY ormconfig.docker.json ormconfig.json
 RUN yarn build
 
 EXPOSE 8080
-CMD [ "node", "dist/app.js" ]
+CMD [ "node", "./dist/src/app.js" ]

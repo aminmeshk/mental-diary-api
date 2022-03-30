@@ -1,0 +1,9 @@
+{
+  "type": "postgres",
+  "host": "db",
+  "port": 5432,
+  "username": "postgres",
+  "password": "EdFSfWW$g2j&W?^@",
+  "database": "mental-diary",
+  "logging": false
+}
