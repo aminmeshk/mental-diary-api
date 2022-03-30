@@ -1,4 +1,5 @@
-import { Sequelize } from "sequelize";
+import { Dialect, Sequelize } from "sequelize";
+import ormconfig from '../../ormconfig.json';
 
 class DatabaseService {
   sequelize: Sequelize | null;
@@ -8,18 +9,32 @@ class DatabaseService {
     this.sequelize = null;
   }
 
-  connect = async () => {
+  connect = async (retries = 20) => {
     const seq = new Sequelize(
-      "postgres://postgres:666676@localhost:5432/mental-diary"
+      {
+        dialect: ormconfig.type as Dialect,
+        host: ormconfig.host,
+        database: ormconfig.database,
+        logging: ormconfig.logging ? console.log : false,
+        username: ormconfig.username,
+        password: ormconfig.password,
+        port: ormconfig.port,
+      }
     );
 
-    try {
-      await seq.authenticate();
-      console.log("Connection has been established sucessfully.");
-      this.sequelize = seq;
-    } catch (error) {
-      console.error("Unable to connect to the database:", error);
+    while (retries > 0) {
+      try {
+        await seq.authenticate();
+        console.log("Connection has been established sucessfully.");
+        this.sequelize = seq;
+        return;
+      } catch (error) {
+        console.error(`Trying to connect to the database, ${retries} retries left`, error);
+        retries -= 1;
+        await new Promise(res => setTimeout(res, 5000));
+      }
     }
+    console.error("Unable to connect to the database");
   };
   static getInstance = async () => {
     if (!DatabaseService.instance) {
