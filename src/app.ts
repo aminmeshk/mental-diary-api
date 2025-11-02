@@ -13,8 +13,7 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
-app.use(morgan(isProduction() ? 'tint' : 'dev'));
-// app.use(morgan('dev'));
+app.use(morgan(isProduction() ? 'tiny' : 'dev'));
 
 app.get("/", (req, res) => {
   res.json("Hello World!");

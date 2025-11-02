@@ -9,7 +9,7 @@ class DatabaseService {
     this.sequelize = null;
   }
 
-  connect = async (retries = 20) => {
+  connect = async (retries = 5) => {
     const seq = new Sequelize(
       {
         dialect: ormconfig.type as Dialect,
@@ -36,6 +36,7 @@ class DatabaseService {
     }
     console.error("Unable to connect to the database");
   };
+
   static getInstance = async () => {
     if (!DatabaseService.instance) {
       DatabaseService.instance = new DatabaseService();
