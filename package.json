@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon",
     "build": "tsc -b",
-    "docker-build": "docker build . -t mental-diary-api",
+    "docker-build": "docker build . -t aminmeshk/mental-diary-api",
     "start-prod": "docker compose up"
   },
   "dependencies": {

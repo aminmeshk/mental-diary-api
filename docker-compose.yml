@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres
+    container_name: mental-diary-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: "EdFSfWW$g2j&W?^@"
@@ -9,10 +10,20 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5433:5432"
-  web:
-    image: mental-diary-api
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mental-diary-api
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "3001:8080"
     environment:
